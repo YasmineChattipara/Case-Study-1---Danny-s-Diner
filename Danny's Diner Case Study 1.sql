@@ -1,4 +1,6 @@
 ---Danny's Diner Case Study 1
+
+--Create table sales, members, menu and insert given values
 CREATE TABLE sales (
   "customer_id" VARCHAR(1),
   "order_date" DATE,
