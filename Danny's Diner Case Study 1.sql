@@ -63,9 +63,21 @@ LEFT JOIN members ON members.customer_id = sales.customer_id
 LEFT JOIN menu ON menu.product_id = sales.product_id
 GROUP BY sales.customer_id;
 
+OUTPUT
+customer_id	total_amount
+A	76
+B	74
+C	36
+	
 --How many days has each customer visited the restaurant?
-select count(DISTINCT order_date) AS  days,customer_id from sales group BY customer_id;
+select customer_id,count(DISTINCT order_date) AS  days from sales group BY customer_id;
 
+OUTPUT
+customer_id	days
+A	4
+B	6
+C	2
+	
 --What was the first item from the menu purchased by each customer?
 with RankedSales AS
 (select m.product_name as item,
@@ -79,6 +91,13 @@ SELECT customer_id,
 from RankedSales 
 where Rnk=1 ;
 
+OUTPUT
+customer_id	item
+A	sushi
+A	curry
+B	curry
+C	ramen
+C	ramen
 
 --What is the most purchased item on the menu and how many times was it purchased by all customers?
 SELECT TOP 1 product_name,
@@ -88,6 +107,9 @@ JOIN menu m ON m.product_id = s.product_id
 GROUP BY product_name
 ORDER BY product_count DESC ;
 
+OUTPUT
+product_name	product_count
+ramen	8
 
 -- Which item was the most popular for each customer?
 WITH RankedItems AS (
@@ -113,6 +135,12 @@ WHERE
 ORDER BY
   customer_id ;
 
+OUTPUT
+product_name	customer_id	product_count
+ramen	A	3
+curry	B	2
+ramen	C	3
+	
 --Which item was purchased first by the customer after they became a member?
 WITH RankedPurchases AS (
   SELECT
@@ -135,6 +163,12 @@ FROM
 WHERE
   purchase_rank = 1;
 
+
+OUTPUT
+customer_id	product_name
+A	curry
+B	sushi
+	
 --Which item was purchased just before the customer became a member?
 WITH RankedPurchases AS (
   SELECT
@@ -157,6 +191,11 @@ FROM
 WHERE
   purchase_rank = 1;
 
+OUTPUT
+customer_id	product_name
+A	ramen
+B	sushi
+	
 --What is the total items and amount spent for each member before they became a member?
 SELECT s.customer_id,
 count(m.product_id) as Total_Items,
@@ -167,6 +206,12 @@ JOIN members ON members.customer_id = s.customer_id
   WHERE
     s.order_date < members.join_date
    group by s.customer_id;
+
+OUTPUT
+customer_id	Total_Items	Amount_Spent
+A	2	25
+B	3	40
+
 --If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 SELECT
     s.customer_id,
@@ -182,6 +227,11 @@ FROM
 GROUP BY 
     s.customer_id;
 
+OUTPUT
+customer_id	points
+A	860
+B	940
+C	360	
 
 --In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
@@ -199,3 +249,7 @@ INNER JOIN members ON s.customer_id = members.customer_id
 WHERE s.order_date <= '2021-01-31'
 GROUP BY s.customer_id;
 
+OUTPUT
+customer_id	points
+A	860
+B	940
